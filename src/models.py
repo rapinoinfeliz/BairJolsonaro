@@ -7,6 +7,58 @@ from datetime import datetime
 db_connect = create_engine('sqlite:///bairjolsonaro.db')
 app = Flask(__name__)
 
+# Tag:
+# - tag_id
+# - name
+# - created_at
+# - updated_at
+class Tags(Resource):
+
+    def get(self):
+        conn = db_connect.connect()
+        query = conn.execute("select * from tags")
+        result = [dict(zip(tuple(query.keys()), i)) for i in query.cursor]
+        return jsonify(result)
+
+    def post(self):
+        conn = db_connect.connect()
+        name = request.json['name']
+        
+        created_at = datetime.date.today()
+        updated_at = datetime.date.today()
+
+        conn.execute(
+            "insert into tags values(null, '{0}','{1}', '{2}')".format(name, created_at, updated_at))
+
+        query = conn.execute('select * from tags order by id desc limit 1')
+        result = [dict(zip(tuple(query.keys()), i)) for i in query.cursor]
+        return jsonify(result)
+
+    def put(self):
+        conn = db_connect.connect()
+        
+        id = request.json['id']
+
+        # Attribute: name
+        if ((request.json['name']) and (request.json['name']!='') ):
+            name = request.json['name']
+        else:
+            name = None
+
+        # Attribute: update_at
+        if ((request.json['update_at']) and (request.json['update_at']!='') ):
+            update_at = request.json['update_at']
+        else:
+            update_at = datetime.date.today()
+
+        conn.execute("update tags set name ='" + str(name) +
+                     "', updated_at ='" + str(updated_at) + "' 
+                     where id =%d " % int(id))
+
+        query = conn.execute("select * from tags where id=%d " % int(id))
+        result = [dict(zip(tuple(query.keys()), i)) for i in query.cursor]
+        return jsonify(result)
+
 
 # Quote:
 # - quote_id (PK)
