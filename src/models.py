@@ -3,6 +3,7 @@ from flask_restful import Resource, Api
 from sqlalchemy import create_engine
 from json import dumps
 from datetime import datetime
+from utils import *
 
 db_connect = create_engine('sqlite:///bairjolsonaro.db')
 app = Flask(__name__)
@@ -97,11 +98,13 @@ class Quotes(Resource):
         
         id = request.json['id']
 
+        # Attribute: content
         if ((request.json['content']) and (request.json['content']!='') ):
             content = request.json['content']
         else:
             content = None
         
+        # Attribute: author_id
         if ((request.json['author_id']) and (request.json['author_id']!='') ):
             author_id = request.json['author_id']
         else:
@@ -112,12 +115,6 @@ class Quotes(Resource):
             source_url = request.json['source_url']
         else:
             source_url = None
-        
-        # # Attribute: created_at
-        # if ((request.json['created_at']) and (request.json['created_at']!='') ):
-        #     created_at = request.json['created_at']
-        # else:
-        #     created_at = None
 
         # Attribute: update_at
         if ((request.json['update_at']) and (request.json['update_at']!='') ):
@@ -125,7 +122,8 @@ class Quotes(Resource):
         else:
             update_at = datetime.date.today()
 
-        conn.execute("update quotes set content ='" + str(content) +
+        conn.execute("update quotes set "'
+                     " 'content ='" + str(content) + "'
                      "', updated_at ='" + str(updated_at) + "'  
                      "', source_url ='" + str(source_url) + "'
                      "', author_id ='" + str(author_id) + "'
